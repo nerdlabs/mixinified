@@ -43,9 +43,7 @@ class MixinB {
   }
 }
 
-const a = new MixinA();
-const b = new MixinB();
-const container = createContainer(a, b);
+const container = createContainer(MixinA, MixinB)();
 
 // regularMethod is not available on container
 {

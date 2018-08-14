@@ -4,19 +4,22 @@ const tail = xs => xs.slice(1);
 const init = xs => xs.slice(0, -1);
 
 const createContainer = (...mixins) => {
-  const strategies = mixins.reduce(
-    (strategies, { constructor: { strategies: mixinStrategies = {} } }) => {
-      Object.entries(mixinStrategies).forEach(([method, strategy]) => {
-        strategies[method] = strategy(
-          mixins.map(instance => instance[method].bind(instance))
-        );
-      });
-      return strategies;
-    },
-    {}
-  );
+  return (...constructorArgs) => {
+    const instances = mixins.map(Mixin => new Mixin(...constructorArgs));
+    const strategies = mixins.reduce(
+      (strategies, { strategies: mixinStrategies = {} }) => {
+        Object.entries(mixinStrategies).forEach(([method, strategy]) => {
+          strategies[method] = strategy(
+            instances.map(instance => instance[method].bind(instance))
+          );
+        });
+        return strategies;
+      },
+      {}
+    );
 
-  return strategies;
+    return strategies;
+  };
 };
 module.exports.createContainer = createContainer;
 
